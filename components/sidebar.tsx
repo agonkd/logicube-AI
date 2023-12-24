@@ -10,13 +10,13 @@ import {
   Settings,
   VideoIcon,
 } from "lucide-react";
-import { Montserrat } from "next/font/google";
+import { Poppins } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FreeCounter } from "@/components/free-counter";
 
-const montserrat = Montserrat({ weight: "200", subsets: ["latin"] });
+const poppins = Poppins({ weight: "200", subsets: ["latin"] });
 
 const routes = [
   {
@@ -64,9 +64,10 @@ const routes = [
 
 interface SidebarProps {
   apiLimitCount: number;
+  isPro: boolean;
 }
 
-const Sidebar = ({ apiLimitCount = 0 }: SidebarProps) => {
+const Sidebar = ({ apiLimitCount = 0, isPro = false }: SidebarProps) => {
   const pathname = usePathname();
 
   return (
@@ -76,7 +77,7 @@ const Sidebar = ({ apiLimitCount = 0 }: SidebarProps) => {
           <div className="relative w-8 h-8 mr-4">
             <Image fill alt="logo" src="/logo.png" />
           </div>
-          <h1 className={cn("text-2xl", montserrat.className)}>logicube</h1>
+          <h1 className={cn("text-2xl", poppins.className)}>logicube</h1>
         </Link>
         <div className="space-y-1">
           {routes.map((route) => (
@@ -98,7 +99,7 @@ const Sidebar = ({ apiLimitCount = 0 }: SidebarProps) => {
           ))}
         </div>
       </div>
-      <FreeCounter apiLimitCount={apiLimitCount} />
+      <FreeCounter isPro={isPro} apiLimitCount={apiLimitCount} />
     </div>
   );
 };

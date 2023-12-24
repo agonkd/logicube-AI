@@ -1,16 +1,11 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { LandingHero } from "@/components/landing-hero";
+import { LandingNavbar } from "@/components/landing-navbar";
 
 const LandingPage = () => {
   return (
-    <header>
-      <p>LandingPage (Unprotected)</p>
-      <Link href="/sign-in">
-        <Button>Login</Button>
-      </Link>
-      <Link href="/sign-up">
-        <Button>Register</Button>
-      </Link>
+    <header className="h-full">
+      <LandingNavbar />
+      <LandingHero />
     </header>
   );
 };
