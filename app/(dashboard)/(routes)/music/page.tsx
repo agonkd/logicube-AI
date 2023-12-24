@@ -3,7 +3,7 @@
 import axios from "axios";
 import * as z from "zod";
 import { Heading } from "@/components/heading";
-import { MessageSquare } from "lucide-react";
+import { MusicIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -13,18 +13,14 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { ChatCompletionMessageParam } from "openai/resources/index.mjs";
 import { Empty } from "@/components/empty";
 import { Loader } from "@/components/loader";
-import { cn } from "@/lib/utils";
-import { UserAvatar } from "@/components/user-avatar";
-import { BotAvatar } from "@/components/bot-avatar";
 import { useProModal } from "@/hooks/use-pro-modal";
 
-const ConversationPage = () => {
+const MusicPage = () => {
   const proModal = useProModal();
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatCompletionMessageParam[]>([]);
+  const [music, setMusic] = useState<string>();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,19 +33,10 @@ const ConversationPage = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const userMessage: ChatCompletionMessageParam = {
-        role: "user",
-        content: values.prompt,
-      };
+      setMusic(undefined);
+      const response = await axios.post("/api/music", values);
 
-      const newMessages = [...messages, userMessage];
-
-      const response = await axios.post("/api/conversation", {
-        messages: newMessages,
-      });
-
-      setMessages((current) => [...current, userMessage, response.data]);
-
+      setMusic(response.data.audio);
       form.reset();
     } catch (error: any) {
       if (error?.response?.status === 403) {
@@ -63,11 +50,11 @@ const ConversationPage = () => {
   return (
     <section>
       <Heading
-        title="Conversation"
-        description="Our most advanced conversation model."
-        icon={MessageSquare}
-        iconColor="text-violet-500"
-        bgColor="bg-violet-500/10"
+        title="Music Generation"
+        description="Turn your prompts into music."
+        icon={MusicIcon}
+        iconColor="text-emerald-500"
+        bgColor="bg-emerald-500/10"
       />
       <div className="px-4 lg:px-8">
         <Form {...form}>
@@ -83,7 +70,7 @@ const ConversationPage = () => {
                     <Input
                       className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                       disabled={isLoading}
-                      placeholder="How do I calculate the radius of a circle?"
+                      placeholder="Piano solo in C major."
                       {...field}
                     />
                   </FormControl>
@@ -101,29 +88,16 @@ const ConversationPage = () => {
               <Loader />
             </div>
           )}
-          {messages.length === 0 && !isLoading && (
-            <Empty label="No conversation started" />
+          {!music && !isLoading && <Empty label="No music started" />}
+          {music && (
+            <audio controls className="w-full mt-8">
+              <source src={music} type="audio/mpeg" />
+            </audio>
           )}
-          <div className="flex flex-col-reverse gap-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.content as string}
-                className={cn(
-                  "p-8 w-full flex items-start gap-x-8 rounded-lg",
-                  message.role === "user"
-                    ? "bg-white border border-black/10"
-                    : "bg-muted"
-                )}
-              >
-                {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
-                <p className="text-sm my-auto">{message.content as string}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>
   );
 };
 
-export default ConversationPage;
+export default MusicPage;
